@@ -1,0 +1,21 @@
+{
+  "channels": [
+    {"id": "C0B6PUACNE6", "name": "28卒_新卒採用"},
+    {"id": "CQTR94NJ2",   "name": "806_corp_採用"},
+    {"id": "C09L55568RF", "name": "826_corp_人事戦略部メンバー"},
+    {"id": "C0ATXD0MNAJ", "name": "吉形大介さん-コーポ確認チャンネル"},
+    {"id": "C07QFSMERS4", "name": "採用チーム_業務チャンネル"},
+    {"id": "C033GL9JQQ2", "name": "新入社員専用"},
+    {"id": "C046Y2BQWCF", "name": "canly_bizreach"},
+    {"id": "C03S0A7KLRK", "name": "canly_forstartups"},
+    {"id": "C06LH5EE86R", "name": "canly_syngress"},
+    {"id": "C07P422UAUS", "name": "カンリー_エージェントセブン"},
+    {"id": "C07N91VVDEV", "name": "808a_corp_オファー業務委託"},
+    {"id": "C02LUTLSQMP", "name": "808b_corp_オファー3等級以下"},
+    {"id": "C06880ACLVC", "name": "808c_corp_オファー4等級"},
+    {"id": "C06880KTB70", "name": "808d_corp_オファー5等級"},
+    {"id": "C0B3KLYJBFD", "name": "808e_corp_オファー6等級以上"},
+    {"id": "C08PKTFFW8L", "name": "808f_corp_オファーアルバイト"}
+  ],
+  "_note": "Agtセクションのcanly_*チャンネルは16件取得済み。未取得チャンネルがあれば id と name を追記してください。"
+}
