@@ -1,6 +1,5 @@
 {
   "permissions": {
-    "defaultMode": "dontAsk",
     "allow": [
       "mcp__9c59f517-d2b1-414a-87fa-607aa98e6362__notion-update-page",
       "mcp__9c59f517-d2b1-414a-87fa-607aa98e6362__notion-create-pages"
