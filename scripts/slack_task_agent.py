@@ -20,7 +20,7 @@ JST = pytz.timezone("Asia/Tokyo")
 SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
 NOTION_API_KEY = os.environ["NOTION_API_KEY"]
 ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
-NOTION_TASK_DB_ID = os.environ.get("NOTION_TASK_DB_ID", "e07b15a5-e659-4b86-86cd-299a5b240403")
+NOTION_TASK_DB_ID = os.environ.get("NOTION_TASK_DB_ID", "3604e7f2-0664-80df-a1c1-cf180b420ee8")
 SLACK_NOTIFY_CHANNEL = os.environ.get("SLACK_NOTIFY_CHANNEL", "D0ATGMNKJK1")
 DAYS_BACK = int(os.environ.get("DAYS_BACK", "7"))
 BUSINESS_DAYS_THRESHOLD = int(os.environ.get("BUSINESS_DAYS_THRESHOLD", "3"))
@@ -132,21 +132,25 @@ def is_duplicate_in_notion(notion: NotionClient, db_id: str, task_name: str) -> 
 
 
 def create_notion_page(notion: NotionClient, db_id: str, task: dict, channel_name: str) -> Optional[str]:
-    priority_map = {"高": "🔥 高", "中": "🔶 中", "低": "🔷 低"}
-    memo = f"#{channel_name} / {task.get('requester','不明')} / {task.get('date','不明')}"
+    summary = f"#{channel_name} / {task.get('requester','不明')} / {task.get('date','不明')}"
     if task.get("mentioned_user"):
-        memo = f"{task['mentioned_user']} 宛メンション / {memo}"
+        summary = f"{task['mentioned_user']} 宛メンション / {summary}"
+
+    hiring_keywords = ["採用", "新卒", "オファー", "bizreach", "forstartups", "syngress", "エージェント"]
+    kind_name = "採用" if any(k in channel_name for k in hiring_keywords) else "作業"
+
+    properties: dict = {
+        "タスク名": {"title": [{"text": {"content": task["task_name"]}}]},
+        "Summary": {"rich_text": [{"text": {"content": summary[:2000]}}]},
+        "種類": {"multi_select": [{"name": kind_name}]},
+    }
+    if task.get("priority") == "高":
+        properties["プライオリティ"] = {"select": {"name": "⚠️"}}
 
     try:
         resp = notion.pages.create(
             parent={"database_id": db_id},
-            properties={
-                "タスク名": {"title": [{"text": {"content": task["task_name"]}}]},
-                "ステータス": {"select": {"name": "🔴 未着手"}},
-                "優先度": {"select": {"name": priority_map.get(task.get("priority", "中"), "🔶 中")}},
-                "カテゴリ": {"select": {"name": "仕事"}},
-                "メモ": {"rich_text": [{"text": {"content": memo[:2000]}}]},
-            },
+            properties=properties,
         )
         page_id = resp["id"].replace("-", "")
         return f"https://app.notion.com/p/{page_id}"

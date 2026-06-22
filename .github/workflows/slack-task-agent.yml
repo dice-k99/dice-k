@@ -10,7 +10,7 @@ on:
   workflow_dispatch:        # 手動実行（テスト用）
 
 env:
-  NOTION_TASK_DB_ID: e07b15a5-e659-4b86-86cd-299a5b240403
+  NOTION_TASK_DB_ID: 3604e7f2-0664-80df-a1c1-cf180b420ee8
   SLACK_NOTIFY_CHANNEL: D0ATGMNKJK1
 
 jobs:
