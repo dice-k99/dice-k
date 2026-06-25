@@ -1,19 +1,14 @@
 # Slack + Gmail タスク整理・日程調整支援エージェント
 
-Slack & Gmail → Notion タスク自動転記 ＆ 日程調整漏れ検出を実行する。
+Slack & Gmail のメッセージを確認し、対応が必要なタスクを抽出・日程調整漏れを検出してSlackに下書きレポートを作成する。
 
 ## 禁止事項（厳守）
 - Slackメッセージの自動送信（必ず下書き保存のみ）
-- 既存タスクの重複登録（必ず事前に notion-search で確認）
-- 個人の評価・印象に関する主観的コメントをNotionに記載すること（事実のみ）
+- 個人の評価・印象に関する主観的コメントをレポートに記載すること（事実のみ）
 
 ## 設定値
 - 対象期間: 直近 **7日間**
 - 日程調整漏れ閾値: **3営業日**以上返信なし
-- Notion DB: `260622_タスク漏れ一覧`
-  - database_id: `3874e7f2-0664-8001-9891-cce5a40dd51a`
-  - data_source_id: `3874e7f2-0664-8088-acfb-000b524443b6`
-  - スキーマ: `名前`（タイトル型）のみ
 - Slack通知先: `D0ATGMNKJK1`（吉形大介 ↔ Claude DM）
 - Gmail対象アドレス: `d.yoshikata@can-ly.com`
 
@@ -104,32 +99,20 @@ thread_id   : GmailスレッドID
 2. 営業日数 ≥ 3 の場合、`get_thread`（format: FULL_CONTENT）で `d.yoshikata@can-ly.com` からの返信メッセージを確認
 3. 自分の返信が存在しない → 「日程調整漏れ」として記録
 
-### ステップ5：Notion重複確認 & 登録
-全タスク（Slack + Gmail）に対して：
-1. `notion-search` でタスク名の先頭20文字を検索し重複確認
-2. 重複なし → `notion-create-pages` で登録
-   - `parent`: `{"data_source_id": "3874e7f2-0664-8088-acfb-000b524443b6", "type": "data_source_id"}`
-   - `名前` プロパティ: `[🔥高] タスク名` / `[🔶中] タスク名` / `[🔷低] タスク名` 形式
-   - `content`（本文）:
-     - Slack: `[Slack] #チャンネル名 / 依頼者:xxx / YYYY-MM-DD`
-     - Gmail: `[Gmail] 送信者:xxx / YYYY-MM-DD`
-3. 重複あり → スキップ（ログに記録）
-
-### ステップ6：Slack下書きレポート作成
+### ステップ5：Slack下書きレポート作成
 `slack_send_message_draft` を使い `D0ATGMNKJK1` に下書きを作成する。
 
 レポート形式：
 ```
 ✅ *[YYYY-MM-DD HH:MM JST] タスクエージェント完了*
 
-*📝 新規Notionタスク N件（Slack: N件 / Gmail: N件）*
-🔥 タスク名 [Slack/#チャンネル名]
-   ↳ Notion URL
-🔶 タスク名 [Gmail/送信者]
-   ↳ Notion URL
+*📝 抽出タスク N件（Slack: N件 / Gmail: N件）*
+🔥 タスク名 [Slack/#チャンネル名 / 依頼者:xxx / YYYY-MM-DD]
+🔶 タスク名 [Gmail / 送信者:xxx / YYYY-MM-DD]
+🔷 タスク名 [Slack/#チャンネル名 / 依頼者:xxx / YYYY-MM-DD]
    ...
 
-新規タスク: N件
+抽出タスク: N件
 
 *⚠️ 日程調整漏れ N件（Slack: N件 / Gmail: N件）*
 • [Slack] チャンネル名: タスク名（X営業日経過、返信なし）
@@ -137,13 +120,13 @@ thread_id   : GmailスレッドID
 
 日程調整漏れ: N件
 ```
-- 新規タスク0件の場合: 「新規タスク: 0件」のみ
+- 抽出タスク0件の場合: 「抽出タスク: 0件」のみ
 - 日程調整漏れ0件の場合: 「日程調整漏れ: 0件」のみ
 - 下書き作成後、チャンネルリンクをチャットに表示する
 
 ## 実行後の報告
 チャットに以下を簡潔に出力：
 - 処理チャンネル数（Slack: 16件 / Gmail: 取得スレッド数）
-- 新規登録タスク数（Notion登録済み / Slack由来・Gmail由来の内訳）
+- 抽出タスク数（Slack由来・Gmail由来の内訳）
 - 日程調整漏れ件数（Slack・Gmail の内訳）
 - Slack下書きリンク
